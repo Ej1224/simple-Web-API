@@ -62,7 +62,6 @@ namespace IntegrationTesting
 
         private async Task<HttpResponseMessage> TransferMoneyAsync(HttpClient client, string source, string dest, decimal amount)
         {
-            //return await client.PostAsync("api/TransferMoneyAPI?sourceAcctId=202309211556581&destAcctId=202309211556582&amount=500", null);
             return await client.PostAsync("api/TransferMoneyAPI?sourceAcctId=" + source + "&destAcctId=" + dest + "&amount=" + amount, null);
         }
     }
