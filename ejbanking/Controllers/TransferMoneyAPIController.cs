@@ -24,7 +24,7 @@ namespace ejbanking.Controllers
         [HttpPost]
         public BankTransactionVM TransferMoney(string sourceAcctId, string destAcctId, decimal amount = 0.0M)
         {
-            string errThr = "", transactionID = "";
+            string retVal = "";
 
             try
             {
@@ -41,61 +41,56 @@ namespace ejbanking.Controllers
 
                             if (sourceBalance_afterDeduct < 0)
                             {
-                                errThr = "Insufficient funds";
+                                retVal = "Insufficient funds";
                             }
                             else if (sourceBalance_afterDeduct == 0)
                             {
-                                errThr = "Account balance cannot be lower than 0";
+                                retVal = "Account balance cannot be lower than 0";
                             }
                             else if (sourceBalance_afterDeduct > 0)
                             {
-                                sourceUser.AccountBalance = sourceBalance_afterDeduct;
-                                _bankUserAccountServices.UpdateBankUserAccount(sourceUser);
-
-                                destUser.AccountBalance += amount;
-                                _bankUserAccountServices.UpdateBankUserAccount(destUser);
-
-                                transactionID = _bankTransactionServices.CreateTransaction(sourceAcctId, destAcctId, amount);
+                                Thread.Sleep(5000);
+                                retVal = _bankTransactionServices.CreateTransaction(sourceUser, destUser, amount);
                             }
                         }
                         else if (sourceUser == destUser)
                         {
-                            errThr = "Source account and destination account cannot be the same";
+                            retVal = "Source account and destination account cannot be the same";
                         }
                     }
                     else if (sourceUser == null)
                     {
-                        errThr = "Source account number not exists";
+                        retVal = "Source account number not exists";
                     }
                     else if (destUser == null)
                     {
-                        errThr = "Destination account number not exists";
+                        retVal = "Destination account number not exists";
                     }
                     else if (amount < 0)
                     {
-                        errThr = "Invalid transfer amount";
+                        retVal = "Invalid transfer amount";
                     }
                 }
                 else if(sourceAcctId.Trim() == "")
                 {
-                    errThr = "Invalid source account number";
+                    retVal = "Invalid source account number";
                 }
                 else if(destAcctId.Trim() == "")
                 {
-                    errThr = "Invalid destination account number";
+                    retVal = "Invalid destination account number";
                 }
                 else if(amount <= 0)
                 {
-                    errThr = "Invalid transfer amount";
+                    retVal = "Invalid transfer amount";
                 }
 
             }
             catch (DbUpdateConcurrencyException)
             {
-                errThr = "Concurrency Exception";
+                retVal = "Concurrency Exception";
             }
 
-            BankTransactionVM result = new BankTransactionVM() { ErrorThrown = errThr, TransactionID = transactionID };
+            BankTransactionVM result = new BankTransactionVM() { ReturnVal = retVal };
             return result;
         }
     }

@@ -14,8 +14,9 @@ namespace ApplicationCore.Services
         }
 
 
-        public string CreateTransaction(string sourceAcctId, string destinationAcctId, decimal transferAmount)
+        public string CreateTransaction(BankUserAccount source, BankUserAccount dest, decimal transferAmount)
         {
+           
             int lastId = 1;
             string transactionID = "";
 
@@ -31,11 +32,11 @@ namespace ApplicationCore.Services
                 transactionID = "T" + DateTime.Now.ToString("yyyyMMdd") + lastId;
             }
 
-            BankTransaction transaction = new BankTransaction(transactionID, "Transfer", sourceAcctId, destinationAcctId, transferAmount);
+            BankTransaction transaction = new BankTransaction(transactionID, "Transfer", source?.AccountId, dest?.AccountId, transferAmount);
 
-            _bankTransactionRepository.CreateTransaction(transaction);
+            var transac_ID_or_err = _bankTransactionRepository.CreateTransaction(source, dest, transaction, transferAmount);
 
-            return transactionID;
+            return transac_ID_or_err;
         }
 
         public IEnumerable<BankTransaction> GetBankTransactions()

@@ -13,10 +13,29 @@ namespace Infrastructure.Data
 
         public IQueryable<BankTransaction> bankTransactions => _catalogContext.BankTransactions;
 
-        public void CreateTransaction(BankTransaction transaction)
+        public string CreateTransaction(BankUserAccount source, BankUserAccount dest, BankTransaction bankTransaction, decimal amount)
         {
-            _catalogContext.Add(transaction);
-            _catalogContext.SaveChanges();
+            using var transaction = _catalogContext.Database.BeginTransaction();
+
+            try
+            {
+                source.AccountBalance -= amount;
+                dest.AccountBalance += amount;
+
+                _catalogContext.Update(source);
+                _catalogContext.Update(dest);
+
+                _catalogContext.Add(bankTransaction);
+
+                _catalogContext.SaveChanges();
+                transaction.Commit();
+
+                return bankTransaction.TransactionId;
+            }
+            catch (Exception)
+            {
+                return "Concurrency Exception";
+            }
         }
     }
 }

@@ -5,6 +5,6 @@ namespace ApplicationCore.Interfaces.Repositories
     public interface IBankTransactionRepository
     {
         IQueryable<BankTransaction> bankTransactions { get; }
-        void CreateTransaction(BankTransaction transaction);
+        string CreateTransaction(BankUserAccount source, BankUserAccount dest, BankTransaction bankTransaction, decimal amount);
     }
 }
